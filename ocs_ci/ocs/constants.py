@@ -94,6 +94,7 @@ CLUSTER_OPERATOR = 'ClusterOperator'
 MONITORING = 'monitoring'
 CLUSTER_SERVICE_VERSION = 'csv'
 JOB = 'job'
+LOCAL_VOLUME = "localvolume"
 
 # Provisioners
 AWS_EFS_PROVISIONER = "openshift.org/aws-efs"
@@ -145,6 +146,7 @@ DEFAULT_ROUTE_CRT = "router-certs-default"
 DEFAULT_NAMESPACE = "default"
 IMAGE_REGISTRY_RESOURCE_NAME = "cluster"
 IMAGE_REGISTRY_CONFIG = "configs.imageregistry.operator.openshift.io/cluster"
+LOCAL_STORAGE_NAMESPACE = "local-storage"
 
 # Default StorageClass
 DEFAULT_STORAGECLASS_CEPHFS = f'{DEFAULT_CLUSTERNAME}-cephfs'
