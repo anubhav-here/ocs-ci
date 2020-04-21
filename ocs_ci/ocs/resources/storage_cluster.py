@@ -11,7 +11,8 @@ from ocs_ci.ocs.resources.csv import CSV
 from ocs_ci.ocs.resources.packagemanifest import get_selector_for_ocs_operator, PackageManifest
 from ocs_ci.utility import utils
 from tests.helpers import check_local_volume
-from ocs_ci.deployment.deployment import get_typed_nodes, get_device_paths
+import os
+import shutil
 
 log = logging.getLogger(__name__)
 
@@ -375,13 +376,21 @@ def add_capacity(osd_size_capacity_requested):
     """
     lvpresent = check_local_volume()
     if lvpresent:
-        workers = get_typed_nodes(node_type='worker')
-        worker_names = [worker.name for worker in workers]
-        device_paths = get_device_paths(worker_names)
-        lv_data = get_localvolume_cr()
-        lv_data['spec']['storageClassDevices'][0][
-            'devicePaths'
-        ] = device_paths
+        path = os.path.join(constants.EXTERNAL_DIR, "device-by-id-ocp")
+        utils.clone_repo(constants.OCP_QE_DEVICEPATH_REPO, path)
+        os.chdir(path)
+        utils.run_cmd("ansible-playbook devices_by_id.yml")
+        dev_paths = utils.run_cmd(f"cat local-storage-block.yaml | grep {osd_size_capacity_requested}")
+        lvcr = get_local_volume_cr()
+        param = f"""[{{ "op": "replace", "path": "/spec/storageClassDevices/0/devicePaths",
+                        "value": {dev_paths}}}]"""
+        lvcr.patch(
+            resource_name=lvcr.get()['items'][0]['metadata']['name'],
+            params=param.strip('\n'),
+            format_type='json'
+        )
+        os.chdir(constants.TOP_DIR)
+        shutil.rmtree(path)
 
     sc = get_storage_cluster()
     old_storage_devices_sets_count = get_deviceset_count()
@@ -444,14 +453,13 @@ def get_deviceset_count():
     )
 
 
-def get_localvolume_cr():
+def get_local_volume_cr():
     """
-    Get localvolumeCR object from local-storage
+    Get localVolumeCR object
 
     Returns:
         dict: Dictionary represents a returned yaml file
 
     """
     ocp_obj = OCP(kind=constants.LOCAL_VOLUME, namespace=constants.LOCAL_STORAGE_NAMESPACE)
-    lvcr = ocp_obj.get('local-block')
-    return lvcr
+    return ocp_obj.get('local-block')

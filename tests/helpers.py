@@ -2119,7 +2119,4 @@ def check_local_volume():
     """
     command = "get localvolume -n local-storage "
     status = OCP.exec_oc_cmd(command, out_yaml_format=False)
-    if "No resources found" in status:
-        return False
-    else:
-        return True
+    return "No resources found" in status
