@@ -10,8 +10,11 @@ from ocs_ci.ocs import constants, defaults
 from ocs_ci.ocs.resources.csv import CSV
 from ocs_ci.ocs.resources.packagemanifest import get_selector_for_ocs_operator, PackageManifest
 from ocs_ci.utility import utils
-from tests.helpers import check_local_volume
-from ocs_ci.deployment.deployment import get_typed_nodes, get_device_paths
+from tests.helpers import check_local_volume, check_pvs_created
+from ocs_ci.ocs.node import get_typed_nodes
+import os
+import shutil
+import yaml
 
 log = logging.getLogger(__name__)
 
@@ -373,21 +376,66 @@ def add_capacity(osd_size_capacity_requested):
     storageDeviceSets->count = (capacity reqested / osd capacity ) + existing count storageDeviceSets
 
     """
+    osd_size_existing = get_osd_size()
+    device_sets_required = int(osd_size_capacity_requested / osd_size_existing)
     lvpresent = check_local_volume()
     if lvpresent:
+        ocp_obj = OCP()
         workers = get_typed_nodes(node_type='worker')
         worker_names = [worker.name for worker in workers]
-        device_paths = get_device_paths(worker_names)
-        lv_data = get_localvolume_cr()
-        lv_data['spec']['storageClassDevices'][0][
-            'devicePaths'
-        ] = device_paths
-
+        output = ocp_obj.exec_oc_cmd("get localvolume local-block -n local-storage -o yaml")
+        cur_device_list = output["spec"]["storageClassDevices"][0]['devicePaths']
+        path = os.path.join(constants.EXTERNAL_DIR, "device-by-id-ocp")
+        utils.clone_repo(constants.OCP_QE_DEVICEPATH_REPO, path)
+        os.chdir(path)
+        utils.run_cmd("ansible-playbook devices_by_id.yml")
+        f = open("local-storage-block.yaml", "r")
+        f2 = open("local-block.yaml", "w")
+        w1, w2, w3 = device_sets_required, device_sets_required, device_sets_required
+        cur_line = f.readline()
+        while "devicePaths:" not in cur_line:
+            f2.write(cur_line)
+            cur_line = f.readline()
+        f2.write(cur_line)
+        cur_line = f.readline()
+        while cur_line:
+            if str(osd_size_capacity_requested) in cur_line:
+                if w1 and (str(worker_names[0]) in cur_line):
+                    if not any(s in cur_line for s in cur_device_list):
+                        f2.write(cur_line)
+                        w1 = w1 - 1
+                if w2 and (str(worker_names[1]) in cur_line):
+                    if not any(s in cur_line for s in cur_device_list):
+                        f2.write(cur_line)
+                        w2 = w2 - 1
+                if w3 and (str(worker_names[2]) in cur_line):
+                    if not any(s in cur_line for s in cur_device_list):
+                        f2.write(cur_line)
+                        w3 = w3 - 1
+            cur_line = f.readline()
+        f.close()
+        f2.close()
+        obj = open("local-block.yaml")
+        lvcr = yaml.load(obj, Loader=yaml.FullLoader)
+        dev_paths = lvcr["spec"]["storageClassDevices"][0]['devicePaths']
+        assert len(dev_paths) == (len(worker_names) * device_sets_required), (
+            f"Current devices available = {len(dev_paths)}"
+        )
+        os.chdir(constants.TOP_DIR)
+        shutil.rmtree(path)
+        cur_device_list.extend(dev_paths)
+        param = f"""[{{ "op": "replace", "path": "/spec/storageClassDevices/0/devicePaths",
+                                     "value": {cur_device_list}}}]"""
+        lvcr = get_local_volume_cr()
+        lvcr.patch(
+            resource_name=lvcr.get()['items'][0]['metadata']['name'],
+            params=param.strip('\n'),
+            format_type='json'
+        )
+        check_pvs_created(len(worker_names) * device_sets_required)
     sc = get_storage_cluster()
     old_storage_devices_sets_count = get_deviceset_count()
-    osd_size_existing = get_osd_size()
-    new_storage_devices_sets_count = int((osd_size_capacity_requested / osd_size_existing)
-                                         + old_storage_devices_sets_count)
+    new_storage_devices_sets_count = int(device_sets_required + old_storage_devices_sets_count)
     # adding the storage capacity to the cluster
     params = f"""[{{ "op": "replace", "path": "/spec/storageDeviceSets/0/count",
                 "value": {new_storage_devices_sets_count}}}]"""
@@ -444,14 +492,13 @@ def get_deviceset_count():
     )
 
 
-def get_localvolume_cr():
+def get_local_volume_cr():
     """
-    Get localvolumeCR object from local-storage
+    Get localVolumeCR object
 
     Returns:
         dict: Dictionary represents a returned yaml file
 
     """
     ocp_obj = OCP(kind=constants.LOCAL_VOLUME, namespace=constants.LOCAL_STORAGE_NAMESPACE)
-    lvcr = ocp_obj.get('local-block')
-    return lvcr
+    return ocp_obj
