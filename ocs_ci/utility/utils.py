@@ -1206,7 +1206,7 @@ def get_testrun_name():
     else:
         build_user = config.REPORTING.get('build_user')
         testrun_name = (
-            f"{config.ENV_DATA.get('platform', '').upper()} "
+            f"BAREMETAL "
             f"{config.ENV_DATA.get('deployment_type', '').upper()} "
             f"{get_az_count()}AZ "
             f"{worker_os} "

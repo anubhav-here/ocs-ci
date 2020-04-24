@@ -11,6 +11,8 @@ import tempfile
 import time
 import yaml
 import threading
+import shutil
+import json
 
 from ocs_ci.ocs.ocp import OCP
 
@@ -22,7 +24,7 @@ from ocs_ci.ocs.exceptions import (
 )
 from concurrent.futures import ThreadPoolExecutor
 from ocs_ci.ocs import constants, defaults, ocp, node
-from ocs_ci.utility import templating
+from ocs_ci.utility import templating,utils
 from ocs_ci.ocs.resources import pod, pvc
 from ocs_ci.ocs.resources.ocs import OCS
 from ocs_ci.ocs.exceptions import CommandFailed, ResourceWrongStatusException
@@ -2117,6 +2119,31 @@ def check_local_volume():
         bool: True if LV present, False if LV not present
 
     """
+    ocp_obj = OCP()
     command = "get localvolume -n local-storage "
-    status = OCP.exec_oc_cmd(command, out_yaml_format=False)
-    return "No resources found" in status
+    status = ocp_obj.exec_oc_cmd(command, out_yaml_format=False)
+    return "No resources found" not in status
+
+
+@retry(AssertionError, 12, 10, 1)
+def check_pvs_created(num_pvs_required):
+    """
+    Verify that exact number of PVs were created and are in the Available state
+    Args:
+        num_pvs_required (int): number of PVs required
+    Raises:
+        AssertionError: if the number of PVs are not in the Available state
+    """
+    logger.info("Verifying PVs are created")
+    out = run_cmd("oc get pv -o json")
+    pv_json = json.loads(out)
+    current_count = 0
+    for pv in pv_json['items']:
+        pv_state = pv['status']['phase']
+        pv_name = pv['metadata']['name']
+        #logger.info("%s is %s", pv_name, pv_state)
+        if pv_state == 'Available':
+            current_count = current_count + 1
+    assert current_count >= num_pvs_required, (
+        f"Current Available PV count is {current_count}"
+    )

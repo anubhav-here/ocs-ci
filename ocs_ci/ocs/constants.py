@@ -146,7 +146,7 @@ DEFAULT_ROUTE_CRT = "router-certs-default"
 DEFAULT_NAMESPACE = "default"
 IMAGE_REGISTRY_RESOURCE_NAME = "cluster"
 IMAGE_REGISTRY_CONFIG = "configs.imageregistry.operator.openshift.io/cluster"
-OCP_QE_DEVICEPATH_REPO = "https://github.com/ctorres80/device-by-id-ocp.git"
+OCP_QE_DEVICEPATH_REPO = "https://github.com/anubhav-here/device-by-id-ocp.git"
 LOCAL_STORAGE_NAMESPACE = 'local-storage'
 
 # Default StorageClass

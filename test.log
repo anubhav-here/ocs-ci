@@ -1,0 +1,216 @@
+Collecting Cluster versions
+============================= test session starts ==============================
+platform linux -- Python 3.7.6, pytest-5.3.5, py-1.8.1, pluggy-0.13.1
+rootdir: /home/anubhav/work/ocs-ci, inifile: pytest.ini
+plugins: metadata-1.8.0, ordering-0.6, html-2.1.1, logger-0.5.1, reportportal-1.10.0, marker-bugzilla-0.9.4
+collected 1 item
+
+tests/manage/z_cluster/cluster_expansion/test_add_capacity.py::TestAddCapacity::test_add_capacity 
+-------------------------------- live log setup --------------------------------
+00:14:52 - MainThread - tests.conftest - INFO - All logs located at /tmp/ocs-ci-logs-1588617846
+00:14:52 - MainThread - ocs_ci.deployment.factory - INFO - Deployment key = vsphere_upi
+00:14:52 - MainThread - ocs_ci.deployment.factory - INFO - Current deployment platform: vsphere,deployment type: upi
+00:14:52 - MainThread - ocs_ci.utility.utils - INFO - Executing command: /home/anubhav/work/ocs-ci/bin/oc version --client
+00:14:52 - MainThread - ocs_ci.utility.utils - INFO - OpenShift Client version: Client Version: 4.3.0-0.nightly-2020-04-24-134944
+
+00:14:52 - MainThread - ocs_ci.ocs.version - INFO - collecting ocs version
+00:14:52 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get clusterversion version -o yaml
+00:14:55 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get namespace  -o yaml
+00:14:59 - MainThread - ocs_ci.ocs.version - INFO - found storage namespaces ['openshift-cluster-storage-operator', 'openshift-storage']
+00:14:59 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-cluster-storage-operator --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get pod  -n openshift-cluster-storage-operator -o yaml
+00:15:01 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get pod  -n openshift-storage -o yaml
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - ClusterVersion .spec.channel: stable-4.3
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - ClusterVersion .status.desired.version: 4.3.0-0.nightly-2020-03-03-052929
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - ClusterVersion .status.desired.image: registry.svc.ci.openshift.org/ocp/release:4.3.0-0.nightly-2020-03-03-052929
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - storage namespace openshift-cluster-storage-operator
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4c36caadce0bf8da22f81930c0c483d580100eaa80d41f5b32f30a973d5dece9 {'quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4c36caadce0bf8da22f81930c0c483d580100eaa80d41f5b32f30a973d5dece9'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - storage namespace openshift-storage
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/rhceph-dev/cephcsi@sha256:f997252fa76983ada58a372d9788586f6b8f83697f696d024020ddab3725c697 {'quay.io/rhceph-dev/cephcsi@sha256:f997252fa76983ada58a372d9788586f6b8f83697f696d024020ddab3725c697'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image registry.redhat.io/openshift4/ose-csi-driver-registrar@sha256:dc468bebfd0e1339f348ee46bdc3d12855017be5debcdc8fafb4b0fad1f2f5a2 {'registry.redhat.io/openshift4/ose-csi-driver-registrar@sha256:dc468bebfd0e1339f348ee46bdc3d12855017be5debcdc8fafb4b0fad1f2f5a2'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image registry.redhat.io/openshift4/ose-csi-external-attacher@sha256:39cf69b150f37604b2efbf0d6e24bf46665f3481706be323f81a48ffa368513b {'registry.redhat.io/openshift4/ose-csi-external-attacher@sha256:39cf69b150f37604b2efbf0d6e24bf46665f3481706be323f81a48ffa368513b'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image registry.redhat.io/openshift4/ose-csi-external-provisioner-rhel7@sha256:2e9f573c928ae3ebb6856a856f5cb76b52b296cea4555a30fa3b008a16bfe979 {'registry.redhat.io/openshift4/ose-csi-external-provisioner-rhel7@sha256:2e9f573c928ae3ebb6856a856f5cb76b52b296cea4555a30fa3b008a16bfe979'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/k8scsi/csi-resizer:v0.4.0 {'quay.io/k8scsi/csi-resizer@sha256:6883482c4c4bd0eabb83315b5a9e8d9c0f34357980489a679a56441ec74c24c9'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/noobaa/pause:latest {'docker.io/kubernetes/pause@sha256:b31bfb4d0213f254d361e0079deaaebefa4f82ba7aa76ef82e90b4935ad5b105'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/rhceph-dev/mcg-core@sha256:9b8177914fbacf7dab308e4a7064b566b331dd6e3a43530f9bd1af5924bcde30 {'quay.io/rhceph-dev/mcg-core@sha256:9b8177914fbacf7dab308e4a7064b566b331dd6e3a43530f9bd1af5924bcde30'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image registry.redhat.io/rhscl/mongodb-36-rhel7@sha256:ad5dc22e6115adc0d875f6d2eb44b2ba594d07330a600e67bf3de49e02cab5b0 {'registry.redhat.io/rhscl/mongodb-36-rhel7@sha256:ad5dc22e6115adc0d875f6d2eb44b2ba594d07330a600e67bf3de49e02cab5b0'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/rhceph-dev/mcg-operator@sha256:6abf4105f59a8efe9fb94c3ae8275be4619cca7146a75a77c478f6e609d9351e {'quay.io/rhceph-dev/mcg-operator@sha256:6abf4105f59a8efe9fb94c3ae8275be4619cca7146a75a77c478f6e609d9351e'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/rhceph-dev/ocs-operator@sha256:7310626bd9ca84f064548dbd2796391430a9620509a5dc40666fcf17950073c6 {'quay.io/rhceph-dev/ocs-operator@sha256:7310626bd9ca84f064548dbd2796391430a9620509a5dc40666fcf17950073c6'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/rhceph-dev/rhceph@sha256:1ec55227084f058c468df5cfff2cd55623668a72ec742af3e8b1c05b52d44d0a {'quay.io/rhceph-dev/rhceph@sha256:1ec55227084f058c468df5cfff2cd55623668a72ec742af3e8b1c05b52d44d0a'}
+00:15:06 - MainThread - ocs_ci.ocs.version - INFO - image quay.io/rhceph-dev/rook-ceph@sha256:469cd797e43e8b75893c0eb07c5ec2390c418d4e3bbdab15bf988ccc9fdb05e6 {'quay.io/rhceph-dev/rook-ceph@sha256:469cd797e43e8b75893c0eb07c5ec2390c418d4e3bbdab15bf988ccc9fdb05e6'}
+00:15:06 - MainThread - tests.conftest - INFO - human readable ocs version info written into /home/anubhav/ocp-anubhav/ocs_version.2020-05-05T00:15:06.068189
+00:15:06 - MainThread - ocs_ci.utility.utils - INFO - testrun_name: OCS4-3-Downstream-OCP4-3-BAREMETAL-UPI-1AZ-RHCOS-3M-3W-tier1
+00:15:06 - MainThread - ocs_ci.utility.utils - INFO - The rook directory /home/anubhav/work/ocs-ci/data/rook already exists, ocs-ci will skip the clone of rook repository.
+00:15:06 - MainThread - ocs_ci.utility.utils - INFO - Fetching latest changes from rook repository.
+00:15:06 - MainThread - ocs_ci.utility.utils - INFO - Executing command: git fetch --all
+00:15:08 - MainThread - ocs_ci.utility.utils - INFO - Checkout rook repository to specific branch: master
+00:15:08 - MainThread - ocs_ci.utility.utils - INFO - Executing command: git checkout master
+00:15:08 - MainThread - ocs_ci.utility.utils - WARNING - Command stderr: Already on 'master'
+
+00:15:08 - MainThread - ocs_ci.utility.utils - INFO - Reset branch: master with latest changes
+00:15:08 - MainThread - ocs_ci.utility.utils - INFO - Executing command: git reset --hard origin/master
+00:15:08 - MainThread - tests.conftest - INFO - Checking for Ceph Health OK 
+00:15:08 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc wait --for condition=ready pod -l app=rook-ceph-tools -n openshift-storage --timeout=120s
+00:15:10 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage get pod -l 'app=rook-ceph-tools' -o jsonpath='{.items[0].metadata.name}'
+00:15:14 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage exec rook-ceph-tools-7597c7f8d4-9gp68 ceph health
+00:15:22 - MainThread - ocs_ci.utility.utils - INFO - Ceph cluster health is HEALTH_OK.
+00:15:22 - MainThread - tests.conftest - INFO - Ceph health check passed at setup
+-------------------------------- live log call ---------------------------------
+00:15:22 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get storagecluster  -n openshift-storage -o yaml
+00:15:24 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get storagecluster  -n openshift-storage -o yaml
+00:15:28 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get localvolume -n local-storage 
+00:15:30 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get node  -o yaml
+00:15:33 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Node rhhi-cap1m.lab.eng.blr.redhat.com
+00:15:35 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Node rhhi-cap2m.lab.eng.blr.redhat.com
+00:15:37 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Node rhhi-cap3m.lab.eng.blr.redhat.com
+00:15:41 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get localvolume local-block -n local-storage -o yaml
+00:15:42 - MainThread - ocs_ci.utility.utils - INFO - Cloning repository into /home/anubhav/work/ocs-ci/external/device-by-id-ocp
+00:15:42 - MainThread - ocs_ci.utility.utils - INFO - Executing command: git clone https://github.com/anubhav-here/device-by-id-ocp.git /home/anubhav/work/ocs-ci/external/device-by-id-ocp
+00:15:45 - MainThread - ocs_ci.utility.utils - WARNING - Command stderr: Cloning into '/home/anubhav/work/ocs-ci/external/device-by-id-ocp'...
+
+00:15:45 - MainThread - ocs_ci.utility.utils - INFO - Checking out repository to specific branch: master
+00:15:45 - MainThread - ocs_ci.utility.utils - INFO - Executing command: git checkout master
+00:15:45 - MainThread - ocs_ci.utility.utils - WARNING - Command stderr: Already on 'master'
+
+00:15:45 - MainThread - ocs_ci.utility.utils - INFO - Reset branch: master with latest changes
+00:15:45 - MainThread - ocs_ci.utility.utils - INFO - Executing command: git reset --hard origin/master
+00:15:45 - MainThread - ocs_ci.utility.utils - INFO - Executing command: ansible-playbook devices_by_id.yml
+00:17:01 - MainThread - ocs_ci.utility.utils - WARNING - Command stderr: [WARNING]: provided hosts list is empty, only localhost is available. Note that
+the implicit localhost does not match 'all'
+
+00:17:01 - MainThread - ocs_ci.ocs.resources.storage_cluster - INFO - ['/dev/disk/by-id/scsi-3600508b1001ca9f64744eb73d7838b3d', '/dev/disk/by-id/scsi-3600508b1001c4afc5a128f35cde295d6', '/dev/disk/by-id/scsi-3600508b1001c66e1b3208253ccda8ae7']
+00:17:01 - MainThread - tests.helpers - INFO - Verifying PVs are created
+00:17:01 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc get pv -o json
+00:17:03 - MainThread - tests.helpers - INFO - local-pv-57d71824 is Bound
+00:17:03 - MainThread - tests.helpers - INFO - local-pv-6d51a7e0 is Available
+00:17:03 - MainThread - tests.helpers - INFO - local-pv-71136c36 is Bound
+00:17:03 - MainThread - tests.helpers - INFO - local-pv-a13adbdf is Available
+00:17:03 - MainThread - tests.helpers - INFO - local-pv-a86ffe53 is Bound
+00:17:03 - MainThread - tests.helpers - INFO - local-pv-e7d7e37 is Available
+00:17:03 - MainThread - tests.helpers - INFO - pvc-6ca1f9ed-8343-4063-acdb-812057a95246 is Bound
+00:17:03 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n local-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get localvolume  -n local-storage -o yaml
+00:17:08 - MainThread - ocs_ci.ocs.ocp - INFO - Command: patch localvolume local-block -n local-storage -p '[{ "op": "replace", "path": "/spec/storageClassDevices/0/devicePaths",
+                                             "value": ['/dev/disk/by-id/scsi-3600508b1001cafe5915b5a3d3780038b', '/dev/disk/by-id/scsi-3600508b1001c98e097385e18be6c78b9', '/dev/disk/by-id/scsi-3600508b1001ce57bcf5d92785a28901c', '/dev/disk/by-id/scsi-3600508b1001ca9f64744eb73d7838b3d', '/dev/disk/by-id/scsi-3600508b1001c4afc5a128f35cde295d6', '/dev/disk/by-id/scsi-3600508b1001c66e1b3208253ccda8ae7']}]' --type json
+00:17:08 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n local-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig patch localvolume local-block -n local-storage -p '[{ "op": "replace", "path": "/spec/storageClassDevices/0/devicePaths",
+                                             "value": ['/dev/disk/by-id/scsi-3600508b1001cafe5915b5a3d3780038b', '/dev/disk/by-id/scsi-3600508b1001c98e097385e18be6c78b9', '/dev/disk/by-id/scsi-3600508b1001ce57bcf5d92785a28901c', '/dev/disk/by-id/scsi-3600508b1001ca9f64744eb73d7838b3d', '/dev/disk/by-id/scsi-3600508b1001c4afc5a128f35cde295d6', '/dev/disk/by-id/scsi-3600508b1001c66e1b3208253ccda8ae7']}]' --type json
+00:17:11 - MainThread - tests.helpers - INFO - Verifying PVs are created
+00:17:11 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc get pv -o json
+00:17:12 - MainThread - tests.helpers - INFO - local-pv-57d71824 is Bound
+00:17:12 - MainThread - tests.helpers - INFO - local-pv-6d51a7e0 is Available
+00:17:12 - MainThread - tests.helpers - INFO - local-pv-71136c36 is Bound
+00:17:12 - MainThread - tests.helpers - INFO - local-pv-a13adbdf is Available
+00:17:12 - MainThread - tests.helpers - INFO - local-pv-a86ffe53 is Bound
+00:17:12 - MainThread - tests.helpers - INFO - local-pv-e7d7e37 is Available
+00:17:12 - MainThread - tests.helpers - INFO - pvc-6ca1f9ed-8343-4063-acdb-812057a95246 is Bound
+00:17:12 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get storagecluster  -n openshift-storage -o yaml
+00:17:15 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get storagecluster  -n openshift-storage -o yaml
+00:17:16 - MainThread - ocs_ci.ocs.ocp - INFO - Command: patch storagecluster ocs-storagecluster -n openshift-storage -p '[{ "op": "replace", "path": "/spec/storageDeviceSets/0/count",
+                "value": 2}]' --type json
+00:17:16 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig patch storagecluster ocs-storagecluster -n openshift-storage -p '[{ "op": "replace", "path": "/spec/storageDeviceSets/0/count",
+                "value": 2}]' --type json
+00:17:19 - MainThread - ocs_ci.ocs.ocp - INFO - Waiting for a resource(s) of kind Pod identified by name '' using selector app=rook-ceph-osd at column name STATUS to reach desired condition Running
+00:17:19 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:17:25 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:17:27 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:17:32 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:17:34 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:17:34 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:17:37 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:17:41 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:17:43 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:17:46 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:17:48 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:17:48 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:17:51 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:17:56 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:17:58 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:18:05 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:18:07 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:18:12 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:18:12 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:18:15 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:18:23 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:18:24 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:18:26 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:18:28 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:18:32 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:18:34 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:18:34 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:18:37 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:18:41 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:18:43 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:18:44 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:18:46 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:18:48 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:18:49 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:18:49 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:18:52 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:19:03 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:19:04 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:19:09 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:19:11 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:19:15 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:19:22 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:19:22 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:19:25 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:19:29 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:19:30 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:19:32 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:19:34 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:19:38 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:19:40 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:19:40 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:19:43 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:19:55 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:19:57 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:20:02 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:20:04 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:20:09 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:20:11 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:20:11 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:20:14 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:20:17 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:20:23 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:20:25 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:20:26 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:20:28 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:20:30 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:20:30 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:20:33 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:20:40 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:20:42 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:20:44 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:20:50 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:20:53 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:20:54 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:20:54 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:20:57 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:21:02 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:21:04 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:21:05 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:21:07 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:21:09 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:21:12 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:21:12 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:21:15 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:21:31 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:21:34 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:21:48 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:21:58 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:22:00 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:22:12 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:22:12 - MainThread - ocs_ci.utility.utils - INFO - Going to sleep for 3 seconds before next iteration
+00:22:15 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod  -n openshift-storage --selector=app=rook-ceph-osd -o yaml
+00:22:19 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-0-69df8bd7f5-q82dj -n openshift-storage
+00:22:24 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-1-6d65b9c584-zghkv -n openshift-storage
+00:22:39 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-2-5d8d78cc97-r4hf4 -n openshift-storage
+00:22:41 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-3-545d565cb-cpssz -n openshift-storage
+00:22:45 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc -n openshift-storage --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig get Pod rook-ceph-osd-4-766c8fcc48-drqkb -n openshift-storage
+00:23:04 - MainThread - ocs_ci.ocs.ocp - INFO - status of  at column STATUS - item(s) were ['Running', 'Running', 'Running', 'Running', 'Running'], but we were waiting for all 6 of them to be Running
+00:23:04 - MainThread - ocs_ci.ocs.ocp - ERROR - timeout expired: Timed Out: (300,)
+00:23:04 - MainThread - ocs_ci.ocs.ocp - ERROR - Wait for Pod resource  at column STATUS to reach desired condition Running failed, last actual status was ['Running', 'Running', 'Running', 'Running', 'Running']
+00:23:04 - MainThread - ocs_ci.ocs.utils - INFO - Must gather image: quay.io/rhceph-dev/ocs-must-gather:latest-4.3 will be used.
+00:23:04 - MainThread - ocs_ci.ocs.utils - INFO - OCS logs will be placed in location /tmp/failed_testcase_ocs_logs_1588617846/test_add_capacity_ocs_logs/ocs_must_gather
+00:23:04 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig adm must-gather --image=quay.io/rhceph-dev/ocs-must-gather:latest-4.3 --dest-dir=/tmp/failed_testcase_ocs_logs_1588617846/test_add_capacity_ocs_logs/ocs_must_gather
+00:29:25 - MainThread - ocs_ci.ocs.utils - INFO - Must gather image: quay.io/openshift/origin-must-gather will be used.
+00:29:25 - MainThread - ocs_ci.ocs.utils - INFO - OCS logs will be placed in location /tmp/failed_testcase_ocs_logs_1588617846/test_add_capacity_ocs_logs/ocp_must_gather
+00:29:25 - MainThread - ocs_ci.utility.utils - INFO - Executing command: oc --kubeconfig /home/anubhav/ocp-anubhav/auth/kubeconfig adm must-gather --image=quay.io/openshift/origin-must-gather --dest-dir=/tmp/failed_testcase_ocs_logs_1588617846/test_add_capacity_ocs_logs/ocp_must_gather

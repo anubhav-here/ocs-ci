@@ -87,7 +87,6 @@ def init_ocsci_conf(arguments=None):
             os.path.expanduser(framework.config.RUN['bin_dir'])
         )
         utils.add_path_to_env_path(framework.config.RUN['bin_dir'])
-    check_config_requirements()
 
 
 def main(argv=None):

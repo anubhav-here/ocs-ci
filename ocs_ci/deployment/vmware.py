@@ -43,29 +43,6 @@ class VSPHEREBASE(Deployment):
         This would be base for both IPI and UPI deployment
         """
         super(VSPHEREBASE, self).__init__()
-        self.region = config.ENV_DATA['region']
-        self.server = config.ENV_DATA['vsphere_server']
-        self.user = config.ENV_DATA['vsphere_user']
-        self.password = config.ENV_DATA['vsphere_password']
-        self.cluster = config.ENV_DATA['vsphere_cluster']
-        self.datacenter = config.ENV_DATA['vsphere_datacenter']
-        self.datastore = config.ENV_DATA['vsphere_datastore']
-        self.vsphere = VSPHEREUtil(self.server, self.user, self.password)
-        self.upi_repo_path = os.path.join(
-            constants.EXTERNAL_DIR,
-            'installer'
-        )
-        self.upi_scale_up_repo_path = os.path.join(
-            constants.EXTERNAL_DIR,
-            'openshift-misc'
-        )
-        os.environ['TF_LOG'] = config.ENV_DATA.get('TF_LOG_LEVEL', "TRACE")
-        os.environ['TF_LOG_PATH'] = os.path.join(
-            config.ENV_DATA.get('cluster_path'),
-            config.ENV_DATA.get('TF_LOG_FILE')
-        )
-
-        self.wait_time = 90
 
     def attach_disk(self, size=100):
         """

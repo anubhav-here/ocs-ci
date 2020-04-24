@@ -1,0 +1,4 @@
+---
+ENV_DATA:
+  platform: 'vsphere'
+  deployment_type: 'upi'
