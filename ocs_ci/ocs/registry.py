@@ -43,9 +43,10 @@ def change_registry_backend_to_ocs():
     )()
 
     # Validate pvc mount in the registry pod
-    retry((CommandFailed, UnexpectedBehaviour), tries=3, delay=15)(
-        validate_pvc_mount_on_registry_pod
-    )()
+    retry(
+        (CommandFailed, UnexpectedBehaviour, AssertionError),
+        tries=3, delay=15
+    )(validate_pvc_mount_on_registry_pod)()
 
 
 def get_registry_pod_obj():
@@ -121,7 +122,9 @@ def validate_pvc_mount_on_registry_pod():
     """
     pod_objs = get_registry_pod_obj()
     for pod_obj in pod_objs:
-        mount_point = pod_obj.exec_cmd_on_pod(command="mount")
+        mount_point = pod_obj.exec_cmd_on_pod(
+            command="mount", out_yaml_format=False,
+        )
         assert "/registry" in mount_point, (
             f"pvc is not mounted on pod {pod_obj.name}"
         )
@@ -153,42 +156,50 @@ def get_default_route_name():
     return route_dict.get('items')[0].get('spec').get('host')
 
 
-def add_role_to_user(role_type, user):
+def add_role_to_user(role_type, user, cluster_role=False, namespace=None):
     """
-    Function to add role to user
+    Function to add a cluster/regular role to user
 
     Args:
         role_type (str): Type of the role to be added
         user (str): User to be added for the role
+        cluster_role (bool): Whether to add a cluster-role or a regular role
+        namespace (str): Namespace to be used
 
     Raises:
         AssertionError: When failure in adding new role to user
 
     """
     ocp_obj = ocp.OCP()
+    cluster = 'cluster-' if cluster_role else ''
+    namespace = f'-n {namespace}' if namespace else ''
     role_cmd = (
-        f"policy add-role-to-user {role_type} {user} "
-        f"-n {constants.OPENSHIFT_IMAGE_REGISTRY_NAMESPACE}"
+        f"adm policy add-{cluster}role-to-user {role_type} {user} {namespace}"
     )
     assert ocp_obj.exec_oc_cmd(command=role_cmd), 'Adding role failed'
     logger.info(f"Role_type {role_type} added to the user {user}")
 
 
-def remove_role_from_user(role_type, user):
+def remove_role_from_user(role_type, user, cluster_role=False, namespace=None):
     """
-    Function to remove role to user
+    Function to remove a cluster/regular role from a user
 
     Args:
         role_type (str): Type of the role to be removed
         user (str): User of the role
+        cluster_role (bool): Whether to remove a cluster-role or a regular role
+        namespace (str): Namespace to be used
 
     Raises:
         AssertionError: When failure in removing role from user
 
     """
     ocp_obj = ocp.OCP()
-    role_cmd = f"policy remove-role-from-user {role_type} {user} " \
-               f"-n {constants.OPENSHIFT_IMAGE_REGISTRY_NAMESPACE}"
+    cluster = 'cluster-' if cluster_role else ''
+    namespace = f'-n {namespace}' if namespace else ''
+    role_cmd = (
+        f"adm policy remove-{cluster}role-from-user {role_type} {user} {namespace}"
+    )
     assert ocp_obj.exec_oc_cmd(command=role_cmd), 'Removing role failed'
     logger.info(f"Role_type {role_type} removed from user {user}")
 

@@ -1,23 +1,29 @@
-import hcl
 import json
 import logging
 import os
 import platform
 import random
+import re
 import shlex
+import smtplib
 import string
 import subprocess
 import time
 import traceback
 from copy import deepcopy
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from shutil import which
 
-
+import hcl
 import requests
 import yaml
-import re
-import smtplib
+from bs4 import BeautifulSoup
+from paramiko import SSHClient, AutoAddPolicy
+from semantic_version import Version
 
+from ocs_ci.framework import config
+from ocs_ci.ocs import constants, defaults
 from ocs_ci.ocs.exceptions import (
     CephHealthException,
     CommandFailed,
@@ -27,15 +33,7 @@ from ocs_ci.ocs.exceptions import (
     UnavailableBuildException,
     UnsupportedOSType,
 )
-from ocs_ci.framework import config
-from ocs_ci.ocs import constants, defaults
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from ocs_ci.utility.retry import retry
-from bs4 import BeautifulSoup
-from paramiko import SSHClient, AutoAddPolicy
-from semantic_version import Version
-
 
 log = logging.getLogger(__name__)
 
@@ -384,6 +382,7 @@ def mask_secrets(plaintext, secrets):
 
 def run_cmd(cmd, secrets=None, timeout=600, ignore_error=False, **kwargs):
     """
+    *The deprecated form of exec_cmd.*
     Run an arbitrary command locally
 
     Args:
@@ -400,13 +399,41 @@ def run_cmd(cmd, secrets=None, timeout=600, ignore_error=False, **kwargs):
 
     Returns:
         (str) Decoded stdout of command
+    """
+    completed_process = exec_cmd(cmd, secrets, timeout, ignore_error, **kwargs)
+    return mask_secrets(completed_process.stdout.decode(), secrets)
+
+
+def exec_cmd(cmd, secrets=None, timeout=600, ignore_error=False, **kwargs):
+    """
+    Run an arbitrary command locally
+
+    Args:
+        cmd (str): command to run
+        secrets (list): A list of secrets to be masked with asterisks
+            This kwarg is popped in order to not interfere with
+            subprocess.run(``**kwargs``)
+        timeout (int): Timeout for the command, defaults to 600 seconds.
+        ignore_error (bool): True if ignore non zero return code and do not
+            raise the exception.
+
+    Raises:
+        CommandFailed: In case the command execution fails
+
+    Returns:
+        (CompletedProcess) A CompletedProcess object of the command that was executed
+        CompletedProcess attributes:
+        args: The list or str args passed to run().
+        returncode (str): The exit code of the process, negative for signals.
+        stdout     (str): The standard output (None if not captured).
+        stderr     (str): The standard error (None if not captured).
 
     """
     masked_cmd = mask_secrets(cmd, secrets)
     log.info(f"Executing command: {masked_cmd}")
     if isinstance(cmd, str):
         cmd = shlex.split(cmd)
-    r = subprocess.run(
+    completed_process = subprocess.run(
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -414,39 +441,24 @@ def run_cmd(cmd, secrets=None, timeout=600, ignore_error=False, **kwargs):
         timeout=timeout,
         **kwargs
     )
-    masked_stdout = mask_secrets(r.stdout.decode(), secrets)
-    if len(r.stdout) > 0:
+    masked_stdout = mask_secrets(completed_process.stdout.decode(), secrets)
+    if len(completed_process.stdout) > 0:
         log.debug(f"Command stdout: {masked_stdout}")
     else:
         log.debug("Command stdout is empty")
-    masked_stderr = mask_secrets(r.stderr.decode(), secrets)
-    if len(r.stderr) > 0:
+
+    masked_stderr = mask_secrets(completed_process.stderr.decode(), secrets)
+    if len(completed_process.stderr) > 0:
         log.warning(f"Command stderr: {masked_stderr}")
     else:
         log.debug("Command stderr is empty")
-    log.debug(f"Command return code: {r.returncode}")
-    if r.returncode and not ignore_error:
+    log.debug(f"Command return code: {completed_process.returncode}")
+    if completed_process.returncode and not ignore_error:
         raise CommandFailed(
             f"Error during execution of command: {masked_cmd}."
             f"\nError is {masked_stderr}"
         )
-    return masked_stdout
-
-
-def run_mcg_cmd(cmd, namespace=None):
-    """
-    Invokes `run_cmd` with a noobaa prefix
-
-    Args:
-        cmd: The MCG command to be run
-        namespace: The namespace to use for the command
-
-    Returns:
-        str: Stdout of the command
-
-    """
-    namespace = namespace if namespace else config.ENV_DATA['cluster_namespace']
-    return run_cmd(f'noobaa -n {namespace} ' + cmd)
+    return completed_process
 
 
 def download_file(url, filename):
@@ -921,7 +933,8 @@ def email_reports():
     msg['To'] = ", ".join(recipients)
 
     html = config.RUN['cli_params']['--html']
-    html_data = open(os.path.expanduser(html)).read()
+    with open(os.path.expanduser(html)) as fd:
+        html_data = fd.read()
     soup = BeautifulSoup(html_data, "html.parser")
 
     parse_html_for_email(soup)
@@ -1111,41 +1124,60 @@ def parse_pgsql_logs(data):
 
     Returns:
         list_data (list): data digestable by scripts with below format
-            e.g. ( with only one item in the list)::
+            e.g.:
 
                 [
-                    {'num_clients': '2', 'num_threads': '7', 'latency_avg': '7',
-                    'lat_stddev': '0', 'tps_incl': '234', 'tps_excl': '243'}
+                {1: {'num_clients': '2','num_threads': '7','latency_avg': '7',
+                'lat_stddev': '0', 'tps_incl': '234', 'tps_excl': '243'},
+                {2: {'num_clients': '2','num_threads': '7','latency_avg': '7',
+                'lat_stddev': '0', 'tps_incl': '234', 'tps_excl': '243'},
+                {3: {'num_clients': '2','num_threads': '7','latency_avg': '7',
+                'lat_stddev': '0', 'tps_incl': '234', 'tps_excl': '243'},
                 ]
+                where keys{1,2,3} are run-IDs
 
     """
-
-    match = re.findall(
-        r'\[\{\'number_.*?\'number_of_transactions_per_client\':\s+\w+}\]',
-        data
-    )
-
+    match = data.split("PGBench Results")
     list_data = []
-    for log in match:
+    for i in range(2, len(match)):
+        log = ''.join(match[i].split('\n'))
         pgsql_data = dict()
+        pgsql_data[i - 1] = {}
+        clients = re.search(r"scaling_factor\':\s+(\d+),", log)
+        if clients and clients.group(1):
+            pgsql_data[i - 1]['scaling_factor'] = clients.group(1)
         clients = re.search(r"number_of_clients\':\s+(\d+),", log)
         if clients and clients.group(1):
-            pgsql_data['num_clients'] = clients.group(1)
-        threads = re.search(r"number of threads\':\s+(\d+)", log)
+            pgsql_data[i - 1]['num_clients'] = clients.group(1)
+        threads = re.search(r"number_of_threads\':\s+(\d+)", log)
         if threads and threads.group(1):
-            pgsql_data['num_threads'] = threads.group(1)
+            pgsql_data[i - 1]['num_threads'] = threads.group(1)
+        clients = re.search(
+            r"number_of_transactions_per_client\':\s+(\d+),", log
+        )
+        if clients and clients.group(1):
+            pgsql_data[i - 1][
+                'number_of_transactions_per_client'
+            ] = clients.group(1)
+        clients = re.search(
+            r"number_of_transactions_actually_processed\':\s+(\d+),", log
+        )
+        if clients and clients.group(1):
+            pgsql_data[i - 1][
+                'number_of_transactions_actually_processed'
+            ] = clients.group(1)
         lat_avg = re.search(r"latency_average_ms\':\s+(\d+)", log)
         if lat_avg and lat_avg.group(1):
-            pgsql_data['latency_avg'] = lat_avg.group(1)
+            pgsql_data[i - 1]['latency_avg'] = lat_avg.group(1)
         lat_stddev = re.search(r"latency_stddev_ms\':\s+(\d+)", log)
         if lat_stddev and lat_stddev.group(1):
-            pgsql_data['lat_stddev'] = lat_stddev.group(1)
+            pgsql_data[i - 1]['lat_stddev'] = lat_stddev.group(1)
         tps_incl = re.search(r"tps_incl_con_est\':\s+(\w+)", log)
         if tps_incl and tps_incl.group(1):
-            pgsql_data['tps_incl'] = tps_incl.group(1)
+            pgsql_data[i - 1]['tps_incl'] = tps_incl.group(1)
         tps_excl = re.search(r"tps_excl_con_est\':\s+(\w+)", log)
         if tps_excl and tps_excl.group(1):
-            pgsql_data['tps_excl'] = tps_excl.group(1)
+            pgsql_data[i - 1]['tps_excl'] = tps_excl.group(1)
         list_data.append(pgsql_data)
 
     return list_data
@@ -1200,6 +1232,12 @@ def get_testrun_name():
     ocs_version_string = f"OCS{ocs_version}" if ocs_version else ''
     worker_os = 'RHEL' if config.ENV_DATA.get('rhel_workers') else 'RHCOS'
     build_user = None
+    baremetal_config = None
+    if config.ENV_DATA.get('mon_type'):
+        baremetal_config = (
+            f"MON {config.ENV_DATA.get('mon_type').upper()} "
+            f"OSD {config.ENV_DATA.get('osd_type').upper()}"
+        )
 
     if config.REPORTING.get('display_name'):
         testrun_name = config.REPORTING.get('display_name')
@@ -1208,6 +1246,12 @@ def get_testrun_name():
         testrun_name = (
             f"{config.ENV_DATA.get('platform', '').upper()} "
             f"{config.ENV_DATA.get('deployment_type', '').upper()} "
+        )
+        if baremetal_config:
+            testrun_name = f"LSO {baremetal_config} {testrun_name}"
+
+        testrun_name = (
+            f"{testrun_name}"
             f"{get_az_count()}AZ "
             f"{worker_os} "
             f"{config.ENV_DATA.get('master_replicas')}M "

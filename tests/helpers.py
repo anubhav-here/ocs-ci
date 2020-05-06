@@ -10,6 +10,7 @@ from subprocess import TimeoutExpired, run, PIPE
 import tempfile
 import time
 import yaml
+import json
 import threading
 import json
 
@@ -110,7 +111,7 @@ def create_pod(
     do_reload=True, namespace=defaults.ROOK_CLUSTER_NAMESPACE,
     node_name=None, pod_dict_path=None, sa_name=None, dc_deployment=False,
     raw_block_pv=False, raw_block_device=constants.RAW_BLOCK_DEVICE, replica_count=1,
-    pod_name=None, node_selector=None
+    pod_name=None, node_selector=None, deploy_pod_status=constants.STATUS_COMPLETED
 ):
     """
     Create a pod
@@ -130,6 +131,8 @@ def create_pod(
         pod_name (str): Name of the pod to create
         node_selector (dict): dict of key-value pair to be used for nodeSelector field
             eg: {'nodetype': 'app-pod'}
+        deploy_pod_status (str): Expected status of deploy pod. Applicable
+            only if dc_deployment is True
 
     Returns:
         Pod: A Pod instance
@@ -203,7 +206,7 @@ def create_pod(
         ocs_obj = create_resource(**pod_data)
         logger.info(ocs_obj.name)
         assert (ocp.OCP(kind='pod', namespace=namespace)).wait_for_resource(
-            condition=constants.STATUS_COMPLETED,
+            condition=deploy_pod_status,
             resource_name=pod_name + '-1-deploy',
             resource_count=0, timeout=180, sleep=3
         )
@@ -456,6 +459,12 @@ def create_storage_class(
     ] = secret_name
     sc_data['parameters'][
         'csi.storage.k8s.io/provisioner-secret-namespace'
+    ] = defaults.ROOK_CLUSTER_NAMESPACE
+    sc_data['parameters'][
+        'csi.storage.k8s.io/controller-expand-secret-name'
+    ] = secret_name
+    sc_data['parameters'][
+        'csi.storage.k8s.io/controller-expand-secret-namespace'
     ] = defaults.ROOK_CLUSTER_NAMESPACE
 
     sc_data['parameters']['clusterID'] = defaults.ROOK_CLUSTER_NAMESPACE
@@ -2110,42 +2119,118 @@ def modify_osd_replica_count(resource_name, replica_count):
     return ocp_obj.patch(resource_name=resource_name, params=params)
 
 
-def check_local_volume():
+def collect_performance_stats():
     """
-    Function to check if Local-volume is present or not
+    Collect performance stats and saves them in file in json format.
 
-    Returns:
-        bool: True if LV present, False if LV not present
+    Performance stats include:
+        IOPs and throughput percentage of cluster
+        CPU, memory consumption of each nodes
 
     """
-    ocp_obj = OCP()
-    command = "get localvolume -n local-storage "
-    status = ocp_obj.exec_oc_cmd(command, out_yaml_format=False)
-    return "No resources found" not in status
+    from ocs_ci.ocs.cluster import CephCluster
+
+    log_dir_path = os.path.join(
+        os.path.expanduser(config.RUN['log_dir']),
+        f"failed_testcase_ocs_logs_{config.RUN['run_id']}",
+        "performance_stats"
+    )
+    if not os.path.exists(log_dir_path):
+        logger.info(f'Creating directory {log_dir_path}')
+        os.makedirs(log_dir_path)
+
+    ceph_obj = CephCluster()
+    performance_stats = {}
+
+    # Get iops and throughput percentage of cluster
+    iops_percentage = ceph_obj.get_iops_percentage()
+    throughput_percentage = ceph_obj.get_throughput_percentage()
+
+    # ToDo: Get iops and throughput percentage of each nodes
+
+    # Get the cpu and memory of each nodes from adm top
+    master_node_utilization_from_adm_top = \
+        node.get_node_resource_utilization_from_adm_top(node_type='master')
+    worker_node_utilization_from_adm_top = \
+        node.get_node_resource_utilization_from_adm_top(node_type='worker')
+
+    # Get the cpu and memory from describe of nodes
+    master_node_utilization_from_oc_describe = \
+        node.get_node_resource_utilization_from_oc_describe(node_type='master')
+    worker_node_utilization_from_oc_describe = \
+        node.get_node_resource_utilization_from_oc_describe(node_type='worker')
+
+    performance_stats['iops_percentage'] = iops_percentage
+    performance_stats['throughput_percentage'] = throughput_percentage
+    performance_stats['master_node_utilization'] = master_node_utilization_from_adm_top
+    performance_stats['worker_node_utilization'] = worker_node_utilization_from_adm_top
+    performance_stats['master_node_utilization_from_oc_describe'] = master_node_utilization_from_oc_describe
+    performance_stats['worker_node_utilization_from_oc_describe'] = worker_node_utilization_from_oc_describe
+
+    file_name = os.path.join(log_dir_path, 'performance')
+    with open(file_name, 'w') as outfile:
+        json.dump(performance_stats, outfile)
 
 
-@retry(AssertionError, 12, 10, 1)
-def check_pvs_created(num_pvs_required):
+def validate_pod_oomkilled(
+    pod_name, namespace=defaults.ROOK_CLUSTER_NAMESPACE, container=None
+):
     """
-    Verify that exact number of PVs were created and are in the Available state
+    Validate pod oomkilled message are found on log
 
     Args:
-        num_pvs_required (int): number of PVs required
+        pod_name (str): Name of the pod
+        namespace (str): Namespace of the pod
+        container (str): Name of the container
+
+    Returns:
+        bool : True if oomkill messages are not found on log.
+               False Otherwise.
 
     Raises:
-        AssertionError: if the number of PVs are not in the Available state
+        Assertion if failed to fetch logs
 
     """
-    logger.info("Verifying PVs are created")
-    out = run_cmd("oc get pv -o json")
-    pv_json = json.loads(out)
-    current_count = 0
-    for pv in pv_json['items']:
-        pv_state = pv['status']['phase']
-        pv_name = pv['metadata']['name']
-        logger.info("%s is %s", pv_name, pv_state)
-        if pv_state == 'Available':
-            current_count = current_count + 1
-    assert current_count >= num_pvs_required, (
-        f"Current Available PV count is {current_count}"
-    )
+    rc = True
+    try:
+        pod_log = pod.get_pod_logs(
+            pod_name=pod_name, namespace=namespace,
+            container=container, previous=True
+        )
+        result = pod_log.find("signal: killed")
+        if result != -1:
+            rc = False
+    except CommandFailed as ecf:
+        assert f'previous terminated container "{container}" in pod "{pod_name}" not found' in str(ecf), (
+            "Failed to fetch logs"
+        )
+
+    return rc
+
+
+def validate_pods_are_running_and_not_restarted(
+    pod_name, pod_restart_count, namespace
+):
+    """
+    Validate given pod is in running state and not restarted or re-spinned
+
+    Args:
+        pod_name (str): Name of the pod
+        pod_restart_count (int): Restart count of pod
+        namespace (str): Namespace of the pod
+
+    Returns:
+        bool : True if pod is in running state and restart
+               count matches the previous one
+
+    """
+    ocp_obj = ocp.OCP(kind=constants.POD, namespace=namespace)
+    pod_obj = ocp_obj.get(resource_name=pod_name)
+    restart_count = pod_obj.get('status').get('containerStatuses')[0].get('restartCount')
+    pod_state = pod_obj.get('status').get('phase')
+    if pod_state == 'Running' and restart_count == pod_restart_count:
+        logger.info("Pod is running state and restart count matches with previous one")
+        return True
+    logger.error(f"Pod is in {pod_state} state and restart count of pod {restart_count}")
+    logger.info(f"{pod_obj}")
+    return False
